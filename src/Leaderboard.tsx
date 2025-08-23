@@ -35,9 +35,12 @@ export default function Leaderboard({
       ".row--last"
     ) as HTMLDivElement;
 
+    //TODO: since Im calling this on overscroll attempt probably won't need these
+    // ---
     const rowRect = row.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
     const isVisible = rowRect.bottom <= containerRect.bottom && rowRect.top >= containerRect.top;
+    // ---
 
     if (!isVisible) return;
 
