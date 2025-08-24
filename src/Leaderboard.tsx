@@ -17,6 +17,7 @@ export default function Leaderboard({
   const [loadingTop, setLoadingTop] = useState(false); //show loader on top
   const [loadingBottom, setLoadingBottom] = useState(false); // show loader at the bottom
   const bodyRef = useRef<HTMLDivElement>(null);
+  const startYRef = useRef<number | null>(null);
 
   useEffect(() => {
     const initialData = info.slice(0, STEP);
@@ -97,8 +98,6 @@ export default function Leaderboard({
       handleLoadMoreEntries("bottom");
     }
   };
-
-  const startYRef = useRef<number | null>(null);
 
   const handleTouchStart = (e) => {
     if (e.touches && e.touches.length > 0) {
