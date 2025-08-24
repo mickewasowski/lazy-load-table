@@ -31,12 +31,12 @@ export default function Leaderboard({
     if (loadingTop) {
       container.scroll({
         top: 0,
-        behavior: 'smooth',
+        behavior: "smooth",
       });
     } else if (loadingBottom) {
       container.scroll({
         top: container.offsetHeight,
-        behavior: 'smooth',
+        behavior: "smooth",
       });
     }
   }, [loadingTop, loadingBottom]);
@@ -98,6 +98,50 @@ export default function Leaderboard({
     }
   };
 
+  const startYRef = useRef<number | null>(null);
+
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches.length > 0) {
+      startYRef.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    const el = bodyRef.current;
+    if (!el) return;
+
+    if (loadingTop || loadingBottom) return;
+    if (startYRef.current === null) return;
+
+    const THRESHOLD = 2;
+
+    const atTop = el.scrollTop === 0;
+    const atBottom =
+      Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop) < THRESHOLD;
+
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - startYRef.current;
+
+    // At top and swiping down (deltaY > 0)
+    if (atTop && deltaY > 0) {
+      console.log("Tried to overscroll at top (touch)");
+      setLoadingTop(true);
+      handleLoadMoreEntries("top");
+      startYRef.current = null; // Prevent repeated triggers
+    }
+    // At bottom and swiping up (deltaY < 0)
+    else if (atBottom && deltaY < 0) {
+      console.log("Tried to overscroll at bottom (touch)");
+      setLoadingBottom(true);
+      handleLoadMoreEntries("bottom");
+      startYRef.current = null; // Prevent repeated triggers
+    }
+  };
+
+  const handleTouchEnd = () => {
+    startYRef.current = null;
+  };
+
   return (
     <div className="leaderboard-container">
       <h2>Tournament Leaderboard</h2>
@@ -110,9 +154,9 @@ export default function Leaderboard({
         <div
           className="body"
           ref={bodyRef}
-          onTouchMove={() => {}}
-          onTouchStart={() => {}}
-          onTouchEnd={() => {}}
+          onTouchMove={handleTouchMove}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           onWheel={handleOverscrollDesktop}
           tabIndex={0}
         >
